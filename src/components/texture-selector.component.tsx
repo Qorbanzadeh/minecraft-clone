@@ -33,6 +33,8 @@ export const TextureSelector = () => {
       wood,
       log,
     };
+
+    // @ts-ignore
     const pressedTexture = Object.entries(textures).find(([k, v]) => v);
     if (pressedTexture) {
       setTexture(pressedTexture[0]);

@@ -1,10 +1,9 @@
 import { useBox } from "@react-three/cannon";
-import { Ref, useEffect, useState } from "react";
+import { Ref, useState } from "react";
 import { useStore } from "../hooks/use-store.hook";
 import * as textures from "../assets/textures";
 import { ThreeEvent } from "@react-three/fiber";
 import { BufferGeometry, Material, Mesh } from "three";
-import { useKeyboard } from "../hooks/use-controls.hook";
 
 interface CubeProps {
   position: [number, number, number];
@@ -22,6 +21,7 @@ export const Cube: React.FC<CubeProps> = ({ position, texture }) => {
     state.removeCube,
   ]);
 
+  // @ts-ignore
   const activeTexture = textures[texture + "Texture"];
 
   const handleClick = (e: ThreeEvent<MouseEvent>): void => {

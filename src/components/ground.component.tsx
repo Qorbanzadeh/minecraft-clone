@@ -15,10 +15,7 @@ import { ThreeEvent } from "@react-three/fiber";
 
 //
 function Ground() {
-  const [addCube, removeCube] = useStore((state) => [
-    state.addCube,
-    state.removeCube,
-  ]);
+  const [addCube] = useStore((state) => [state.addCube]);
   // This is a custom hook that simplifies the creation of a physics-enabled plane,
   // which is required for collision detection with other objects in the scene.
   const [ref] = usePlane(() => ({
