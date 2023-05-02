@@ -2,10 +2,12 @@ import { useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import axeUrl from "../assets/axe.glb";
 
-export default function AxeModel(props) {
+export default function AxeModel(props: { position: number[] }) {
   const group = useRef();
+  // @ts-ignore
   const { nodes, materials } = useGLTF(axeUrl);
   return (
+    // @ts-ignore
     <group ref={group} dispose={null} {...props}>
       <group rotation={[0, Math.PI / 1.8, -0.3]} scale={0.5}>
         <mesh

@@ -1,83 +1,65 @@
-import { useFrame, useThree } from "@react-three/fiber";
+// TODO: don't use this!
+// @ts-nocheck
+
+import * as THREE from "three";
+import { RefObject, useEffect, useRef } from "react";
 import { useSphere } from "@react-three/cannon";
-import { Ref, useEffect, useRef } from "react";
-import { BufferGeometry, Material, Mesh, Vector3 } from "three";
+import { useThree, useFrame } from "@react-three/fiber";
+import Axe from "./axe.component";
 import { useKeyboard } from "../hooks/use-controls.hook";
 
-// constants
-const JUMP_FORCE = 4;
-const SPEED = 4;
+const SPEED = 3;
+const direction = new THREE.Vector3();
+const frontVector = new THREE.Vector3();
+const sideVector = new THREE.Vector3();
+const rotation = new THREE.Vector3();
+const speed = new THREE.Vector3();
 
 const Player = () => {
-  const { moveBackward, moveForward, moveRight, moveLeft, jump } =
-    useKeyboard();
-  // get the camera instance
-  const { camera } = useThree();
-  // `ref` is a reference to the sphere object
-  // `api` is a set of methods for manipulating it.
+  const axe = useRef<RefObject<THREE.Group>>();
   const [ref, api] = useSphere(() => ({
     mass: 1,
     type: "Dynamic",
-    position: [0, 2, 0],
+    position: [0, 10, 0],
   }));
-
-  // creates a reference to the velocity of the sphere object
-  // and sets up a subscription to updates to that value.
-  const vel = useRef([0, 0, 0]);
-  useEffect(() => {
-    api.velocity.subscribe((v) => (vel.current = v));
-  }, [api.velocity]);
-
-  // creates a reference to the position of the sphere object
-  // and sets up a subscription to updates to that value.
-  const pos = useRef([0, 0, 0]);
-  useEffect(() => {
-    api.position.subscribe((p) => (pos.current = p));
-  }, [api.position]);
-
-  // called on each frame update
-  useFrame(() => {
-    // set the position of the camera to be equal to
-    // the current position of the player (as stored in the pos ref).
-    camera.position.copy(
-      new Vector3(pos.current[0], pos.current[1], pos.current[2])
-    );
-
-    const direction = new Vector3();
-    // determine if the player is moving forward or backward
-    const frontVector = new Vector3(
-      0,
-      0,
-      (moveBackward ? 1 : 0) - (moveForward ? 1 : 0)
-    );
-    // determine if the player is moving left or right
-    const sideVector = new Vector3(
-      (moveLeft ? 1 : 0) - (moveRight ? 1 : 0),
-      0,
-      0
-    );
-
-    // determine the player's movement direction and speed
+  const { moveForward, moveBackward, moveLeft, moveRight, jump } =
+    useKeyboard();
+  const { camera } = useThree();
+  const velocity = useRef([0, 0, 0]);
+  useEffect(() => api.velocity.subscribe((v) => (velocity.current = v)), []);
+  useFrame((state) => {
+    ref.current?.getWorldPosition(camera.position);
+    frontVector.set(0, 0, Number(moveBackward) - Number(moveForward));
+    sideVector.set(Number(moveLeft) - Number(moveRight), 0, 0);
     direction
       .subVectors(frontVector, sideVector)
       .normalize()
       .multiplyScalar(SPEED)
       .applyEuler(camera.rotation);
-
-    // set the velocity of the player's sphere to match the movement direction and speed determined above
-    api.velocity.set(
-      direction.x,
-      vel.current[1], // maintain the current velocity in the y-axis (i.e. the vertical direction)
-      direction.z
+    speed.fromArray(velocity.current);
+    axe.current.children[0].rotation.x = THREE.MathUtils.lerp(
+      axe.current.children[0].rotation.x,
+      Math.sin((speed.length() > 1) * state.clock.elapsedTime * 10) / 6,
+      0.1
     );
-
-    if (jump && Math.abs(vel.current[1]) < 0.05) {
-      api.velocity.set(vel.current[0], JUMP_FORCE, vel.current[2]);
-    }
+    axe.current.rotation.copy(camera.rotation);
+    axe.current.position
+      .copy(camera.position)
+      .add(camera.getWorldDirection(rotation).multiplyScalar(1));
+    api.velocity.set(direction.x, velocity.current[1], direction.z);
+    if (jump && Math.abs(velocity.current[1].toFixed(2)) < 0.05)
+      api.velocity.set(velocity.current[0], 5, velocity.current[2]);
   });
-
   return (
-    <mesh ref={ref as Ref<Mesh<BufferGeometry, Material | Material[]>>}></mesh>
+    <>
+      <mesh ref={ref} />
+      <group
+        ref={axe}
+        onPointerMissed={(e) => (axe.current.children[0].rotation.x = -0.5)}
+      >
+        <Axe position={[0.3, -0.35, 0.5]} />
+      </group>
+    </>
   );
 };
 
