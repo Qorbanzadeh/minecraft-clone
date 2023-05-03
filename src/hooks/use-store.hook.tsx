@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import { DEFAULT_CUBES } from "../constant";
 
-interface Cube {
+export interface Cube {
   key: string;
   pos: [number, number, number];
   texture: string;

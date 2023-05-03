@@ -12,6 +12,7 @@ import { TextureSelector } from "./texture-selector.component";
 import { useKeyboard } from "../hooks/use-controls.hook";
 import { useEffect } from "react";
 import { useStore } from "../hooks/use-store.hook";
+import { DEFAULT_CUBES } from "../constant";
 
 function World() {
   const { exit } = useKeyboard();
@@ -25,6 +26,10 @@ function World() {
       toggleMenu();
     }
   }, [exit, toggleMenu]);
+
+  useEffect(() => {
+    window.localStorage.setItem("cubes", JSON.stringify(DEFAULT_CUBES));
+  }, []);
 
   return (
     <>
