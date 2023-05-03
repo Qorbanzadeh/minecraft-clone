@@ -49,9 +49,8 @@ export const TextureSelector = () => {
     <div className="absolute -translate-x-1/2 -translate-y-1/2 bottom-20 left-1/2 scale-[5] flex justify-center items-center">
       {Object.entries(images).map(([k, src], i) => {
         return (
-          <div className="relative">
+          <div className="relative" key={k}>
             <img
-              key={k}
               src={src}
               alt={k}
               className={`${
