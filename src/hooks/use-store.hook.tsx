@@ -18,6 +18,7 @@ export interface Store {
   resetWorld: () => void;
   isMenuVisible: boolean;
   toggleMenu: () => void;
+  setDefaultCubes: (cubes: Cube[]) => void;
 }
 
 const getLocalStorage = (key: string) =>
@@ -43,6 +44,9 @@ export const useStore = create<Store>((set) => ({
         },
       ],
     }));
+  },
+  setDefaultCubes: (cubes) => {
+    setLocalStorage("cubes", cubes);
   },
   removeCube: (x, y, z) => {
     set((prev) => ({

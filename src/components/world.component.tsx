@@ -19,7 +19,10 @@ function World() {
   const [toggleMenu, isMenuVisible] = useStore((state) => [
     state.toggleMenu,
     state.isMenuVisible,
+    state.setDefaultCubes,
   ]);
+
+  const setDefaultCubes = useStore((state) => state.setDefaultCubes);
 
   useEffect(() => {
     if (exit) {
@@ -28,7 +31,7 @@ function World() {
   }, [exit, toggleMenu]);
 
   useEffect(() => {
-    window.localStorage.setItem("cubes", JSON.stringify(DEFAULT_CUBES));
+    setDefaultCubes(DEFAULT_CUBES);
   }, []);
 
   return (
